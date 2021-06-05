@@ -29,12 +29,12 @@ function start() {
         }
     ).then((data) => {
         switch (data.action) {
-            case "View All Heros":
-                employee.printEmployees();
+            case "View All Heroes":
+                employee.printHero();
                 start();
                 break;
             case "View All Roles":
-                role.printRoles();
+                role.printClass();
                 start();
                 break;
             case "View All Departments":
@@ -42,43 +42,38 @@ function start() {
                 start();
                 break;
             case "Add Hero":
-                addEmployee();
+                addHero();
                 break;
             case "Add Role":
-                addRole();
+                addClass();
                 break;
             case "Add Department":
                 addThreatLevel();
                 break;
             case "Update Hero Role":
-                updateEmployeeRole();
+                heroPromotion();
                 break;
             case "Update Hero Manager":
-                updateEmployeeManager();
+                updateUnderling();
                 break;
             case "Remove Hero":
-                removeEmployee();
+                removeHero();
                 break;
             case "Remove Role":
-                removeRole();
+                removeClass();
                 break;
             case "Remove Department":
                 removeThreatLevel();
                 break;
             case "Exit":
-                console.log(`Thank you for using our HR Employee Tracker. Have a great day.`);
-                break;
-            default:
-                console.log(`Action (${data.action}) is not supported.`);
-                start();
+                console.log(`Thank you for using our Hero Database. Enjoy your day.`);
                 break;
         }
     });
 }
 
-// This function will handle adding a role
-function addDepartment() {
-    let question = "What department would you like to add?";
+function addThreatLevel() {
+    let question = `Is there a new Threat Level? What is it?`;
     Inquirer.prompt(
         {
             name: "department",
@@ -86,16 +81,15 @@ function addDepartment() {
             message: question
         }
     ).then((data) => {
-        department.insertDepartment(data.department);
+        department.insertThreatLevel(data.department);
         start();
     });
 }
 
-// This function will handle adding a role
-function addRole() {
+function addClass() {
     let departments = ["No Department"];
-    // First get the list of departments    
-    query("SELECT * FROM department",
+      
+    query(`SELECT * FROM department`,
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -104,9 +98,9 @@ function addRole() {
                 }
             }
 
-            // Get the role details
+           
             let questions = [
-                "What is the role title you would like to add?",
+                "What is the role you would like to add?",
                 "What is the role salary?",
                 "What is the role department?"];
             Inquirer.prompt([
@@ -135,7 +129,7 @@ function addRole() {
                         break;
                     }
                 }
-                role.insertRole(data.title, data.salary, departmentId);
+                role.insertClass(data.title, data.salary, departmentId);
                 start();
             });
 
@@ -143,27 +137,25 @@ function addRole() {
     );
 }
 
-// This function will handle adding an employee
-function addEmployee() {
+function addHero() {
     let roles = ["No Role"];
     let managers = ["No Manager"];
-    // First get the list of roles    
-    query("SELECT * FROM role ",
-        function (err, roleRes) {
+      
+    query(`SELECT * FROM role `,
+        function (err, roleCall) {
             if (err) console.log(err);
-            for (let i = 0; i < roleRes.length; i++) {
-                if (roleRes[i].title) {
-                    roles.push(roleRes[i].title);
+            for (let i = 0; i < roleCall.length; i++) {
+                if (roleCall[i].title) {
+                    roles.push(roleCall[i].title);
                 }
             }
 
-            // Next get list of possible managers
-            query("SELECT * from employee ",
-                function (err, empRes) {
+            query(`SELECT * from employee `,
+                function (err, heroCall) {
                     if (err) console.log(err);
-                    for (let i = 0; i < empRes.length; i++) {
-                        if (empRes[i].first_name) {
-                            managers.push(empRes[i].first_name + " " + empRes[i].last_name);
+                    for (let i = 0; i < heroCall.length; i++) {
+                        if (heroCall[i].first_name) {
+                            managers.push(heroCall[i].first_name + " " + heroCall[i].last_name);
                         }
                     }
 
@@ -213,7 +205,7 @@ function addEmployee() {
                                 break;
                             }
                         }
-                        employee.insertEmployee(data.firstName, data.lastName, roleId, managerId);
+                        employee.insertHero(data.firstName, data.lastName, roleId, managerId);
                         start();
                     });
 
@@ -223,27 +215,27 @@ function addEmployee() {
     );
 }
 
-// This function will handle updating an employee role
-function updateEmployeeRole() {
+
+function heroPromotion() {
     let roles = ["No Role"];
     let employees = [];
-    // First get the list of roles    
-    query("SELECT * FROM role ",
-        function (err, roleRes) {
+      
+    query(`SELECT * FROM role `,
+        function (err, roleCall) {
             if (err) console.log(err);
-            for (let i = 0; i < roleRes.length; i++) {
-                if (roleRes[i].title) {
-                    roles.push(roleRes[i].title);
+            for (let i = 0; i < roleCall.length; i++) {
+                if (roleCall[i].title) {
+                    roles.push(roleCall[i].title);
                 }
             }
 
-            // Next get list of possible managers
-            query("SELECT * from employee ",
-                function (err, empRes) {
+            
+            query(`SELECT * from employee `,
+                function (err, heroCall) {
                     if (err) console.log(err);
-                    for (let i = 0; i < empRes.length; i++) {
-                        if (empRes[i].first_name) {
-                            employees.push(empRes[i].first_name + " " + empRes[i].last_name);
+                    for (let i = 0; i < heroCall.length; i++) {
+                        if (heroCall[i].first_name) {
+                            employees.push(heroCall[i].first_name + " " + heroCall[i].last_name);
                         }
                     }
 
@@ -278,7 +270,7 @@ function updateEmployeeRole() {
                             if (empRes[i].first_name + " " + empRes[i].last_name === data.employee) {
                                 employee.setProperties(empRes[i]);
                                 employee.role_id = roleId;
-                                employee.updateEmployee();
+                                employee.updateHero();
                                 break;
 
                             }
@@ -292,11 +284,11 @@ function updateEmployeeRole() {
     );
 }
 
-// This function will handle updating an employee role
-function updateEmployeeManager() {
+
+function updateUnderling() {
     let managers = ["No Manager"];
     let employees = [];
-    // First get the list of roles    
+     
     query("SELECT * FROM employee ",
         function (err, res) {
             if (err) console.log(err);
@@ -307,7 +299,7 @@ function updateEmployeeManager() {
                 }
             }
 
-            // Get the employee details
+            
             let questions = [
                 "Who's manager would you like to update?",
                 "Who is their new manager?"];
@@ -325,7 +317,7 @@ function updateEmployeeManager() {
                     choices: managers
                 }
             ]).then((data) => {
-                // get the manager to tie to 
+                /
                 let managerId = null;
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].first_name + " " + res[i].last_name === data.manager) {
@@ -333,12 +325,12 @@ function updateEmployeeManager() {
                         break;
                     }
                 }
-                // Get the employee to update to
+                
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].first_name + " " + res[i].last_name === data.employee) {
                         employee.setProperties(res[i]);
                         employee.manager_id = managerId;
-                        employee.updateEmployee();
+                        employee.updateHero();
                         break;
                     }
                 }
@@ -348,10 +340,10 @@ function updateEmployeeManager() {
     );
 }
 
-// This function will handle adding a role
-function removeEmployee() {
+
+function removeHero() {
     let employees = ["No Employee"];
-    // First get the list of roles    
+       
     query(`SELECT * FROM employee`,
         function (err, res) {
             if (err) console.log(err);
@@ -375,7 +367,7 @@ function removeEmployee() {
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].first_name + " " + res[i].last_name === data.employee) {
                         employee.setProperties(res[i]);
-                        employee.deleteEmployee();
+                        employee.deleteHero();
                         break;
                     }
                 }
@@ -386,10 +378,10 @@ function removeEmployee() {
     );
 }
 
-// This function will handle adding a role
-function removeRole() {
+
+function removeClass() {
     let roles = ["No Role"];
-    // First get the list of roles    
+     
     query(`SELECT * FROM role`,
         function (err, res) {
             if (err) console.log(err);
@@ -399,7 +391,7 @@ function removeRole() {
                 }
             }
 
-            // Get the role details
+           
             let question = "Select the role to remove?";
             Inquirer.prompt([
                 {
@@ -409,7 +401,7 @@ function removeRole() {
                     choices: roles
                 }
             ]).then((data) => {
-                // get the role to remove 
+                
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].title === data.role) {
                         role.setProperties(res[i]);
@@ -424,10 +416,10 @@ function removeRole() {
     );
 }
 
-// This function will handle adding a role
+
 function removeThreatLevel() {
     let departments = ["No Department"];
-    // First get the list of departments    
+      
     query(`SELECT * FROM department`,
         function (err, res) {
             if (err) console.log(err);
@@ -437,7 +429,7 @@ function removeThreatLevel() {
                 }
             }
 
-            // Get the role details
+            
             let question = "Select the department to remove?";
             Inquirer.prompt([
                 {
@@ -447,7 +439,7 @@ function removeThreatLevel() {
                     choices: departments
                 }
             ]).then((data) => {
-                // get the department to remove 
+               
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].name === data.department) {
                         department.setProperties(res[i]);

@@ -1,13 +1,26 @@
+const Inquirer = require('inquirer');
+const MySQL = require('mysql2');
+const Employee = require('./lib/Employee');
+const Department = require('./lib/Department');
+const Role = require('./lib/Role');
+const db = require('./db/connections');
+const cTable = require('console.table');
+const chalk = require('chalk');
 
-const Inquirer = require("inquirer");
-const MySQL = require("mysql2");
+let employee = new Employee(db);
+let role = new Role(db);
+let department = new Department(db);
 
 
 
-function start() {
+function heroDatabase() {
+    console.log(chalk.blue.bgRed(`UserName: *************`));
+    console.log(chalk.blue.bgRed(`Password: ********************`));
+    console.log(chalk.black.bgYellow(`Welcome Agoni Bigchin to the Hero Association HERO DATABASE!`));
+
     let question = "What would you like to do?";
     let options = [
-        "View All Heros",
+        "View All Heroes",
         "Add Hero",
         "Remove Hero",
         "Update Hero Role",
@@ -30,16 +43,16 @@ function start() {
     ).then((data) => {
         switch (data.action) {
             case "View All Heroes":
-                employee.printHero();
-                start();
+                employee.viewHero();
+                heroDatabase();
                 break;
             case "View All Roles":
                 role.printClass();
-                start();
+                heroDatabase();
                 break;
             case "View All Departments":
-                department.printThreatLevel();
-                start();
+                department.viewThreatLevels();
+                heroDatabase();
                 break;
             case "Add Hero":
                 addHero();
@@ -66,7 +79,11 @@ function start() {
                 removeThreatLevel();
                 break;
             case "Exit":
-                console.log(`Thank you for using our Hero Database. Enjoy your day.`);
+                console.log(chalk.bgBlue.black(`Thank you for using our Hero Database. Enjoy your day.`));
+                break;
+                default:
+                console.log(`Action (${data.action}) is not supported.`);
+                heroDatabase();
                 break;
         }
     });
@@ -81,15 +98,15 @@ function addThreatLevel() {
             message: question
         }
     ).then((data) => {
-        department.insertThreatLevel(data.department);
-        start();
+        department.makeThreatLevels(data.department);
+        heroDatabase();
     });
 }
 
 function addClass() {
     let departments = ["No Department"];
       
-    query(`SELECT * FROM department`,
+    db.query(`SELECT * FROM department`,
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -121,7 +138,7 @@ function addClass() {
                     choices: departments
                 }
             ]).then((data) => {
-                // get the department to tie to 
+                
                 let departmentId = null;
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].name === data.department) {
@@ -129,8 +146,8 @@ function addClass() {
                         break;
                     }
                 }
-                role.insertClass(data.title, data.salary, departmentId);
-                start();
+                role.makeClass(data.title, data.salary, departmentId);
+                heroDatabase();
             });
 
         }
@@ -141,23 +158,23 @@ function addHero() {
     let roles = ["No Role"];
     let managers = ["No Manager"];
       
-    query(`SELECT * FROM role `,
-        function (err, roleCall) {
-            if (err) console.log(err);
-            for (let i = 0; i < roleCall.length; i++) {
-                if (roleCall[i].title) {
-                    roles.push(roleCall[i].title);
-                }
+    db.query(`SELECT * FROM role `,
+    function (err, roleRes) {
+        if (err) console.log(err);
+        for (let i = 0; i < roleRes.length; i++) {
+            if (roleRes[i].title) {
+                roles.push(roleRes[i].title);
             }
+        }
 
-            query(`SELECT * from employee `,
-                function (err, heroCall) {
-                    if (err) console.log(err);
-                    for (let i = 0; i < heroCall.length; i++) {
-                        if (heroCall[i].first_name) {
-                            managers.push(heroCall[i].first_name + " " + heroCall[i].last_name);
-                        }
+            db.query(`SELECT * from employee `,
+            function (err, empRes) {
+                if (err) console.log(err);
+                for (let i = 0; i < empRes.length; i++) {
+                    if (empRes[i].first_name) {
+                        managers.push(empRes[i].first_name + " " + empRes[i].last_name);
                     }
+                }
 
                     // Get the employee details
                     let questions = [
@@ -205,8 +222,8 @@ function addHero() {
                                 break;
                             }
                         }
-                        employee.insertHero(data.firstName, data.lastName, roleId, managerId);
-                        start();
+                        employee.becomeHero(data.firstName, data.lastName, roleId, managerId);
+                        heroDatabase();
                     });
 
                 }
@@ -220,24 +237,24 @@ function heroPromotion() {
     let roles = ["No Role"];
     let employees = [];
       
-    query(`SELECT * FROM role `,
-        function (err, roleCall) {
-            if (err) console.log(err);
-            for (let i = 0; i < roleCall.length; i++) {
-                if (roleCall[i].title) {
-                    roles.push(roleCall[i].title);
-                }
+    db.query(`SELECT * FROM role `,
+    function (err, roleRes) {
+        if (err) console.log(err);
+        for (let i = 0; i < roleRes.length; i++) {
+            if (roleRes[i].title) {
+                roles.push(roleRes[i].title);
             }
+        }
 
             
-            query(`SELECT * from employee `,
-                function (err, heroCall) {
-                    if (err) console.log(err);
-                    for (let i = 0; i < heroCall.length; i++) {
-                        if (heroCall[i].first_name) {
-                            employees.push(heroCall[i].first_name + " " + heroCall[i].last_name);
-                        }
+            db.query(`SELECT * from employee `,
+            function (err, empRes) {
+                if (err) console.log(err);
+                for (let i = 0; i < empRes.length; i++) {
+                    if (empRes[i].first_name) {
+                        employees.push(empRes[i].first_name + " " + empRes[i].last_name);
                     }
+                }
 
                     // Get the employee details
                     let questions = [
@@ -257,7 +274,7 @@ function heroPromotion() {
                             choices: roles
                         }
                     ]).then((data) => {
-                        // get the role to tie to 
+                        
                         let roleId = null;
                         for (let i = 0; i < roleRes.length; i++) {
                             if (roleRes[i].title === data.role) {
@@ -265,7 +282,7 @@ function heroPromotion() {
                                 break;
                             }
                         }
-                        // Get the employee to update to
+                       
                         for (let i = 0; i < empRes.length; i++) {
                             if (empRes[i].first_name + " " + empRes[i].last_name === data.employee) {
                                 employee.setProperties(empRes[i]);
@@ -275,7 +292,7 @@ function heroPromotion() {
 
                             }
                         }
-                        start();
+                        heroDatabase();
                     });
 
                 }
@@ -289,7 +306,7 @@ function updateUnderling() {
     let managers = ["No Manager"];
     let employees = [];
      
-    query("SELECT * FROM employee ",
+    db.query("SELECT * FROM employee ",
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -317,7 +334,7 @@ function updateUnderling() {
                     choices: managers
                 }
             ]).then((data) => {
-                /
+                
                 let managerId = null;
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].first_name + " " + res[i].last_name === data.manager) {
@@ -334,7 +351,7 @@ function updateUnderling() {
                         break;
                     }
                 }
-                start();
+                heroDatabase();
             });
         }
     );
@@ -344,7 +361,7 @@ function updateUnderling() {
 function removeHero() {
     let employees = ["No Employee"];
        
-    query(`SELECT * FROM employee`,
+     db.query(`SELECT * FROM employee`,
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -367,11 +384,11 @@ function removeHero() {
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].first_name + " " + res[i].last_name === data.employee) {
                         employee.setProperties(res[i]);
-                        employee.deleteHero();
+                        employee.removeHero();
                         break;
                     }
                 }
-                start();
+                heroDatabase();
             });
 
         }
@@ -382,7 +399,7 @@ function removeHero() {
 function removeClass() {
     let roles = ["No Role"];
      
-    query(`SELECT * FROM role`,
+    db.query(`SELECT * FROM role`,
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -405,11 +422,11 @@ function removeClass() {
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].title === data.role) {
                         role.setProperties(res[i]);
-                        role.deleteRole();
+                        role.removeClass();
                         break;
                     }
                 }
-                start();
+                heroDatabase();
             });
 
         }
@@ -420,7 +437,7 @@ function removeClass() {
 function removeThreatLevel() {
     let departments = ["No Department"];
       
-    query(`SELECT * FROM department`,
+    db.query(`SELECT * FROM department`,
         function (err, res) {
             if (err) console.log(err);
             for (let i = 0; i < res.length; i++) {
@@ -443,15 +460,15 @@ function removeThreatLevel() {
                 for (let i = 0; i < res.length; i++) {
                     if (res[i].name === data.department) {
                         department.setProperties(res[i]);
-                        department.deleteDepartment();
+                        department.removeThreatLevels();
                         break;
                     }
                 }
-                start();
+                heroDatabase();
             });
 
         }
     );
 }
 
-start();
+heroDatabase();

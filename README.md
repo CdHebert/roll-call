@@ -1,8 +1,11 @@
 # Hero_Database
 
+![get-started](./images/start-up.png)
+![exit](./images/exit.png)
+
 ## Description
 
-Hero Database helps you keep trak of the heroes in your employ and allows you to edit them for promotions and pay raises, it also lets you remove them from your employ.
+Hero Database helps you keep track of the heroes in your employ and allows you to edit them for promotions and pay raises, it also lets you remove them from your employ.
 
 ## Table of Contents
 
@@ -27,8 +30,8 @@ Cody Hebert was the only contributor to this. if anyone else wants to contribute
 there is no tests for this project
 
 ## Links
-- Walkthrough video
-- GitHub https://github.com/CdHebert/roll-call
+- Walkthrough video: https://www.youtube.com/watch?v=Z3O1ad-_Jw4
+- GitHub: https://github.com/CdHebert/roll-call
 
 ## Questions
 

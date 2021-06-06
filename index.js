@@ -14,10 +14,7 @@ let department = new Department(db);
 
 
 function heroDatabase() {
-    console.log(chalk.blue.bgRed(`UserName: *************`));
-    console.log(chalk.blue.bgRed(`Password: ********************`));
-    console.log(chalk.black.bgYellow(`Welcome Agoni Bigchin to the Hero Association HERO DATABASE!`));
-
+    
     let question = "What would you like to do?";
     let options = [
         "View All Heroes",

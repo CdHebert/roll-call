@@ -11,7 +11,11 @@ const db = mysql.createConnection(
       password: 'root',
       database: 'hero_call'
     },
-    console.log(chalk.bgRed.black(`Enter your username and password.`))
+    console.log(chalk.bgRed.black(`Enter your username and password.`)),
+    console.log(chalk.blue.bgRed(`UserName: *************`)),
+    console.log(chalk.blue.bgRed(`Password: ********************`)),
+    console.log(chalk.black.bgYellow(`Welcome Agoni Bigchin to the Hero Association HERO DATABASE!`))
+
   );
 
   db.connect(function (err) {
